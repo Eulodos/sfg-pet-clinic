@@ -1,10 +1,7 @@
 package com.alward.trainings.sfgpetclinic.bootstrap;
 
 import com.alward.trainings.sfgpetclinic.model.*;
-import com.alward.trainings.sfgpetclinic.services.OwnerService;
-import com.alward.trainings.sfgpetclinic.services.PetTypeService;
-import com.alward.trainings.sfgpetclinic.services.SpecialityService;
-import com.alward.trainings.sfgpetclinic.services.VetService;
+import com.alward.trainings.sfgpetclinic.services.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -17,12 +14,14 @@ public class DataLoader implements CommandLineRunner {
     private final VetService vetService;
     private final PetTypeService petTypeService;
     private final SpecialityService specialityService;
+    private final VisitService visitService;
 
-    public DataLoader(OwnerService ownerService, VetService vetService, PetTypeService petTypeService, SpecialityService specialityService) {
+    public DataLoader(OwnerService ownerService, VetService vetService, PetTypeService petTypeService, SpecialityService specialityService, VisitService visitService) {
         this.ownerService = ownerService;
         this.vetService = vetService;
         this.petTypeService = petTypeService;
         this.specialityService = specialityService;
+        this.visitService = visitService;
     }
 
     @Override
@@ -104,5 +103,12 @@ public class DataLoader implements CommandLineRunner {
         vetService.save(vet2);
 
         System.out.println("Loaded Vets....");
+
+        Visit dogVisit = new Visit();
+        dogVisit.setDate(LocalDate.now());
+        dogVisit.setPet(mikesPet);
+        dogVisit.setDescription("Periodic vaccination against rabies");
+
+        visitService.save(dogVisit);
     }
 }
