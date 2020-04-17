@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -30,6 +31,11 @@ public class OwnerSpringDataJpaService implements OwnerService {
     public Owner findByLastName(String lastName) {
         return ownerRepository.findByLastName(lastName)
                 .orElseThrow(() -> new RuntimeException("No owner matching provided lastName was found"));
+    }
+
+    @Override
+    public List<Owner> findAllByLastNameContaining(String lastName) {
+        return ownerRepository.findAllByLastNameContainingIgnoreCase(lastName);
     }
 
     @Override
