@@ -45,4 +45,9 @@ public class VisitSpringDataJpaService implements VisitService {
     public void deleteById(Long aLong) {
         visitRepository.deleteById(aLong);
     }
+
+    @Override
+    public Set<Visit> findByPetId(Long petId) {
+        return visitRepository.findByPetId(petId);
+    }
 }
