@@ -10,9 +10,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,6 +26,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 class VisitControllerTest {
+
+    private static final LocalDate PET_BIRTHDAY = LocalDate.of(2020, 4, 3);
 
     @Mock
     private VisitService visitService;
@@ -43,7 +47,7 @@ class VisitControllerTest {
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(visitController).build();
 
-        pet = Pet.builder().id(1L).build();
+        pet = Pet.builder().id(1L).birthDate(PET_BIRTHDAY).build();
         visits = new HashSet<>();
         visits.add(Visit.builder().id(1L).build());
         visits.add(Visit.builder().id(2L).build());
@@ -59,7 +63,7 @@ class VisitControllerTest {
                 .andExpect(model().attributeExists("pet"))
                 .andExpect(view().name("pets/createOrUpdateVisitForm"));
 
-        verify(petService, timeout(1)).findById(anyLong());
+        verify(petService, times(1)).findById(anyLong());
     }
 
     @Test
@@ -67,11 +71,14 @@ class VisitControllerTest {
         when(petService.findById(anyLong())).thenReturn(pet);
         when(visitService.findByPetId(anyLong())).thenReturn(visits);
 
-        mockMvc.perform(post("/owners/1/pets/1/visits/new"))
+        mockMvc.perform(post("/owners/1/pets/1/visits/new")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("petId", "1")
+                .param("birthDate", PET_BIRTHDAY.toString()))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(model().attributeExists("pet"))
                 .andExpect(view().name("redirect:/owners/{ownerId}"));
 
-        verify(visitService, timeout(1)).save(any());
+        verify(visitService, times(1)).save(any());
     }
 }

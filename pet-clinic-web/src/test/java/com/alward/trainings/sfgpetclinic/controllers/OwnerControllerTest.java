@@ -5,7 +5,6 @@ import com.alward.trainings.sfgpetclinic.services.OwnerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,6 +19,7 @@ import java.util.Set;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -74,8 +74,22 @@ class OwnerControllerTest {
 
         mockMvc.perform(get("/owners"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("/owners/ownersList"))
+                .andExpect(view().name("owners/ownersList"))
                 .andExpect(model().attribute("selections", hasSize(2)));
+    }
+
+    @Test
+    void processFindFormEmptyReturnMany() throws Exception {
+        when(ownerService.findAllByLastNameContaining(anyString()))
+                .thenReturn(Arrays.asList(Owner.builder().id(1L).build(),
+                        Owner.builder().id(2L).build()));
+
+        mockMvc.perform(get("/owners")
+                .param("lastName", ""))
+                .andExpect(status().isOk())
+                .andExpect(view().name("owners/ownersList"))
+                .andExpect(model().attribute("selections", hasSize(2)));
+        ;
     }
 
     @Test
